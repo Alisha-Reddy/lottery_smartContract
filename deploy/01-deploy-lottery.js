@@ -12,11 +12,16 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     if (developmentChains.includes(network.name)) {
         log("local network detected")
-        const vrfCoordinatorV2Mock = await deployments.get("VRFCoordinatorV2Mock")
+        // const vrfCoordinatorV2Mock = await ethers.getContractAt("VRFCoordinatorV2Mock")
         // log("vrfCoordinatorV2Mock :", vrfCoordinatorV2Mock)
-        vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address
-        log("vrfCoordinatorV2Address:", vrfCoordinatorV2Address)
+        const deployment = await deployments.get("VRFCoordinatorV2Mock")
+        const vrfCoordinatorV2Mock = await ethers.getContractAt(deployment.abi, deployment.address)
+        // vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address
+        // log("vrfCoordinatorV2Address:", vrfCoordinatorV2Address)
+        vrfCoordinatorV2Address = deployment.address
+        // log('vrfCoordinatorV2Address:', vrfCoordinatorV2Address)
         const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
+        // log("transactionResponse:" , transactionResponse)
         const transactionReceipt = await transactionResponse.wait(1)
         subscriptionId = transactionReceipt.events[0].args.subId
         //Fund the subscription
@@ -30,7 +35,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     const enteranceFee = networkConfig[chainId]["enteranceFee"]
     const gasLane = networkConfig[chainId]["gasLane"]
-    const callbackGasLimit = networkConfig[chainlink]["callbackGasLimit"]
+    const callbackGasLimit = networkConfig[chainId]["callbackGasLimit"]
     const interval = networkConfig[chainId]["interval"]
 
     const args = [
@@ -42,7 +47,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         interval,
     ]
 
-    const lottery = await deploy("lottery", {
+    const lottery = await deploy("Lottery", {
         from: deployer,
         args: args,
         log: true,
