@@ -1,14 +1,13 @@
 //SPDX-License-Modifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 // Enter the lottery (paying some amount)
 // Pick a random winner (varifiably randome)
 // Winner to be selected every X minutes --> completely automated
 
 // Chainlink oracle is necessary for randomness and automated execution(Chainlink keeper)
-
 import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/vrf/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol";
 
 error Lottery__NotEnoughETHEntered();
@@ -52,7 +51,7 @@ contract Lottery is VRFConsumerBaseV2, AutomationCompatibleInterface {
 
     /* Functions */
     constructor(
-        address vrfCoordinatorV2,
+        address vrfCoordinatorV2, //contract address
         uint256 enteranceFee,
         bytes32 gasLane,
         uint64 subscriptionId,
