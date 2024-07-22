@@ -34,3 +34,7 @@ gas-report.txt
 deployments
 node_modules
 node_modules
+<<<<<<< HEAD
+=======
+test/staging/stepsWithAutomationChainlik.txt
+>>>>>>> ce6c0da (5)

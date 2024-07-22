@@ -6,14 +6,11 @@ require("hardhat-gas-reporter")
 require("hardhat-contract-sizer")
 require("dotenv").config()
 
-
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL
 const PRIVATE_KEY = process.env.PRIVATE_KEY
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "key";
-const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "key";
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "key"
+const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "key"
 
-    
-    
 module.exports = {
     defaultNetworks: "hardhats",
     networks: {
@@ -36,7 +33,7 @@ module.exports = {
         coinmarketcap: COINMARKETCAP_API_KEY,
         token: "MATIC",
     },
-    solidity: "0.8.24",
+    solidity: "0.8.19",
     namedAccounts: {
         deployer: {
             default: 0,
@@ -44,5 +41,11 @@ module.exports = {
         player: {
             default: 1,
         },
+    },
+    mocha: {
+        timeout: 900000,
+    },
+    etherscan: {
+        apiKey: ETHERSCAN_API_KEY,
     },
 }

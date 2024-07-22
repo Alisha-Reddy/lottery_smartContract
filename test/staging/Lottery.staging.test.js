@@ -1,18 +1,14 @@
-const { network, getNamedAccounts, ethers } = require("hardhat")
+const { network, getNamedAccounts, ethers, deployments } = require("hardhat")
 const { developmentChains } = require("../../helper-hardhat-config")
 const { assert } = require("chai")
 
 developmentChains.includes(network.name)
     ? describe.skip
     : describe("Raffle staging test", () => {
-          let lottery, lotteryEnteranceFee, deployer
+          let lottery, lotteryEnteranceFee, deployer, vrfCoordinatorV2Mock
 
           beforeEach(async () => {
               deployer = (await getNamedAccounts()).deployer
-              vrfCoordinatorV2Mock = await ethers.getContractAt(
-                  "VRFCoordinatorV2Mock",
-                  vrfCoordinatorV2MockDeployed.address,
-              )
               const lotteryDeployed = await deployments.get("Lottery")
               lottery = await ethers.getContractAt("Lottery", lotteryDeployed.address)
               lotteryEnteranceFee = await lottery.getEnteranceFee()
@@ -23,7 +19,6 @@ developmentChains.includes(network.name)
                 // enter the lottery
                 const startingTimeStamp = await lottery.getLatestTimeStamp()
                 const accounts = await ethers.getSigners()
-                console.log("1")
 
                 await new Promise(async (resolve, reject) => {
                     lottery.once("WinnerPicked", async () => {

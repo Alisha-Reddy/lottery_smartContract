@@ -181,7 +181,6 @@ const { assert, expect } = require("chai")
                               const winnerEndingBalnce = await accounts[1].getBalance()
                               assert.equal(numPlayers.toString, "0")
                               assert.equal(lotteryState.toString, "0")
-                              assert(endingTimeStamp > startingTimeStamp)
                               assert.equal(
                                   winnerEndingBalnce.toString(),
                                   winnerStartingBalance.add(
@@ -191,25 +190,26 @@ const { assert, expect } = require("chai")
                                           .toString(),
                                   ),
                               )
-                            } catch (e) {
-                                reject(e)
-                            }
-                        })
-                        //Setting up the listener
-                        const tx = await lottery.performUpKeep([])
-                        const txReceipt = await tx.wait(1)
-                        
-                        //   // Ensure txReceipt.events[1].args.requestId is correct
-                        //   const requestId = txReceipt.events[1].args.requestId
-                        //   console.log("Request ID:", requestId)
-                        
-                        //   below, we will fire the event and the listener will pick it up and resolve
-                        const winnerStartingBalance = await accounts[1].getBalance()
-                        await vrfCoordinatorV2Mock.fulfillRandomWords(
-                            txReceipt.events[1].args.requestId,
-                            lottery.address,
-                        )
-                        resolve()
+                              assert(endingTimeStamp > startingTimeStamp)
+                              resolve()
+                          } catch (e) {
+                              reject(e)
+                          }
+                      })
+                      //Setting up the listener
+                      const tx = await lottery.performUpKeep([])
+                      const txReceipt = await tx.wait(1)
+
+                      //   // Ensure txReceipt.events[1].args.requestId is correct
+                      //   const requestId = txReceipt.events[1].args.requestId
+                      //   console.log("Request ID:", requestId)
+
+                      //   below, we will fire the event and the listener will pick it up and resolve
+                      const winnerStartingBalance = await accounts[1].getBalance()
+                      await vrfCoordinatorV2Mock.fulfillRandomWords(
+                          txReceipt.events[1].args.requestId,
+                          lottery.address,
+                      )
                   })
               })
           })
