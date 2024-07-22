@@ -1,7 +1,7 @@
 const { ethers, network, deployments, getNamedAccounts } = require("hardhat")
 
 async function mockKeepers() {
-    const {deployer} = await getNamedAccounts()
+    const { deployer } = await getNamedAccounts()
     // const deployment = await deployments.get("Lottery")
     const lottery = await ethers.getContractAt("Lottery", deployer)
     const checkData = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(""))

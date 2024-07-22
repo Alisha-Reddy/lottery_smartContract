@@ -197,7 +197,7 @@ const { assert, expect } = require("chai")
                           }
                       })
                       //Setting up the listener
-                      const tx = await lottery.performUpKeep([])
+                      const tx = await lottery.performUpkeep([])
                       const txReceipt = await tx.wait(1)
 
                       //   // Ensure txReceipt.events[1].args.requestId is correct

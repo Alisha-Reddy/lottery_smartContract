@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle")
+require("@nomiclabs/hardhat-ethers")
 require("@nomicfoundation/hardhat-verify")
 require("hardhat-deploy")
 require("solidity-coverage")
@@ -22,7 +23,7 @@ module.exports = {
             url: SEPOLIA_RPC_URL,
             accounts: [PRIVATE_KEY],
             chainId: 11155111,
-            blovckConfirmations: 6,
+            blockConfirmations: 6,
         },
     },
     gasReporter: {
