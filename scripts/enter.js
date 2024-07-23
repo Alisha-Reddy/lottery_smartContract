@@ -4,7 +4,7 @@ async function enterLottery() {
     const { deployer } = await getNamedAccounts()
     const deployment = await deployments.get("Lottery")
     const lottery = await ethers.getContractAt("Lottery", deployment.address)
-    // console.log(lottery)
+    // console.log("lottery :", lottery)
 
     const enteranceFee = await lottery.getEnteranceFee()
     // console.log(enteranceFee)

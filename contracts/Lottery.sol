@@ -19,11 +19,7 @@ import "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 error Lottery__NotEnoughETHEntered();
 error Lottery_TransferFailed();
 error Lottery_NotOpen();
-error Lottery_UpKeepNotNeeded(
-    uint256 currentBalance,
-    uint256 numPlayers,
-    uint256 lotteryState
-);
+error Lottery_UpKeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 lotteryState);
 
 /**@title A sample Lottery Contract
  * @author Alisha Reddy Kondapu
@@ -101,17 +97,26 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
      */
     function checkUpkeep(
         bytes memory /*checkData*/
-    )
-        public
-        override
-        returns (bool upKeepNeeded, bytes memory /* performData*/)
-    {
+    ) public override returns (bool upKeepNeeded, bytes memory /* performData*/) {
         bool isOpen = (LotteryState.OPEN == s_lotteryState);
         bool timePassed = (block.timestamp - s_lastTimeStamp) > i_interval;
         bool hasPlayers = (s_players.length > 0);
         bool hasBalance = address(this).balance > 0;
         upKeepNeeded = (isOpen && timePassed && hasPlayers && hasBalance);
-        // return (upKeepNeeded, "0x0");
+
+        if (!isOpen) {
+            revert("Lottery is not open");
+        }
+        if (!timePassed) {
+            revert("Time interval has not passed");
+        }
+        if (!hasPlayers) {
+            revert("No players in the lottery");
+        }
+        if (!hasBalance) {
+            revert("Lottery balance is zero");
+        }
+        return (upKeepNeeded, "");
     }
 
     function performUpkeep(bytes calldata /*performData*/) external override {

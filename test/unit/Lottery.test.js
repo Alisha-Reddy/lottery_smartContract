@@ -20,6 +20,8 @@ const { assert, expect } = require("chai")
               lottery = await ethers.getContractAt("Lottery", lotteryDeployed.address)
               lotteryEnteranceFee = await lottery.getEnteranceFee()
               interval = await lottery.getInterval()
+
+            //   vrfCoordinatorV2Mock.addConsumer(1, lotteryDeployed.address)
           })
 
           describe("constructor", () => {
