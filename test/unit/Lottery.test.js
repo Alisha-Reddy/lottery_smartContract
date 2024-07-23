@@ -21,7 +21,7 @@ const { assert, expect } = require("chai")
               lotteryEnteranceFee = await lottery.getEnteranceFee()
               interval = await lottery.getInterval()
 
-            //   vrfCoordinatorV2Mock.addConsumer(1, lotteryDeployed.address)
+              //   vrfCoordinatorV2Mock.addConsumer(1, lotteryDeployed.address)
           })
 
           describe("constructor", () => {
@@ -93,7 +93,7 @@ const { assert, expect } = require("chai")
                   await lottery.enterLottery({ value: lotteryEnteranceFee })
                   await network.provider.send("evm_increaseTime", [interval.toNumber() - 1])
                   await network.provider.request({ method: "evm_mine", params: [] })
-                  const { upKeepNeeded } = await lottery.callStatic.checkUpKeep("0x")
+                  const { upKeepNeeded } = await lottery.callStatic.checkUpkeep("0x")
                   assert(!upKeepNeeded)
               })
 
@@ -168,6 +168,7 @@ const { assert, expect } = require("chai")
                   //   fulfillRandomWords (mock being the Chainlink VRF)
                   //   we will have to wait for the fulfillRandomWords to be called
                   await new Promise(async (resolve, reject) => {
+                      console.log("here")
                       lottery.once("WinnerPicked", async () => {
                           console.log("Found the event!")
                           try {
@@ -183,6 +184,7 @@ const { assert, expect } = require("chai")
                               const winnerEndingBalnce = await accounts[1].getBalance()
                               assert.equal(numPlayers.toString, "0")
                               assert.equal(lotteryState.toString, "0")
+                              assert(endingTimeStamp > startingTimeStamp)
                               assert.equal(
                                   winnerEndingBalnce.toString(),
                                   winnerStartingBalance.add(
@@ -192,26 +194,33 @@ const { assert, expect } = require("chai")
                                           .toString(),
                                   ),
                               )
-                              assert(endingTimeStamp > startingTimeStamp)
                               resolve()
                           } catch (e) {
                               reject(e)
                           }
                       })
                       //Setting up the listener
-                      const tx = await lottery.performUpkeep([])
-                      const txReceipt = await tx.wait(1)
 
-                      //   // Ensure txReceipt.events[1].args.requestId is correct
-                      //   const requestId = txReceipt.events[1].args.requestId
-                      //   console.log("Request ID:", requestId)
+                      try {
+                          const tx = await lottery.performUpkeep([])
+                          const txReceipt = await tx.wait(1)
 
-                      //   below, we will fire the event and the listener will pick it up and resolve
-                      const winnerStartingBalance = await accounts[1].getBalance()
-                      await vrfCoordinatorV2Mock.fulfillRandomWords(
-                          txReceipt.events[1].args.requestId,
-                          lottery.address,
-                      )
+                          //   // Ensure txReceipt.events[1].args.requestId is correct
+                          //   const requestId = txReceipt.events[1].args.requestId
+                          //   console.log("Request ID:", requestId)
+
+                          //   below, we will fire the event and the listener will pick it up and resolve
+                          const winnerStartingBalance = await accounts[1].getBalance()
+                          console.log("here 2")
+                          await vrfCoordinatorV2Mock.fulfillRandomWords(
+                              txReceipt.events[1].args.requestId,
+                              lottery.address,
+                          )
+                          resolve()
+                      } catch (e) {
+                          console.log(e)
+                          reject(e)
+                      }
                   })
               })
           })
