@@ -104,18 +104,18 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         bool hasBalance = address(this).balance > 0;
         upKeepNeeded = (isOpen && timePassed && hasPlayers && hasBalance);
 
-        if (!isOpen) {
-            revert("Lottery is not open");
-        }
-        if (!timePassed) {
-            revert("Time interval has not passed");
-        }
-        if (!hasPlayers) {
-            revert("No players in the lottery");
-        }
-        if (!hasBalance) {
-            revert("Lottery balance is zero");
-        }
+        // if (!isOpen) {
+        //     revert("Lottery is not open");
+        // }
+        // if (!timePassed) {
+        //     revert("Time interval has not passed");
+        // }
+        // if (!hasPlayers) {
+        //     revert("No players in the lottery");
+        // }
+        // if (!hasBalance) {
+        //     revert("Lottery balance is zero");
+        // }
         return (upKeepNeeded, "");
     }
 

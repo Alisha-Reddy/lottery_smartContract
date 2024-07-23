@@ -92,9 +92,14 @@ const { assert, expect } = require("chai")
               it("returns false if enough time hasn't passed", async () => {
                   await lottery.enterLottery({ value: lotteryEnteranceFee })
                   await network.provider.send("evm_increaseTime", [interval.toNumber() - 1])
-                  await network.provider.request({ method: "evm_mine", params: [] })
+                  await network.provider.send("evm_mine", [])
+                  //   await network.provider.request({ method: "evm_mine", params: [] })
                   const { upKeepNeeded } = await lottery.callStatic.checkUpkeep("0x")
-                  assert(!upKeepNeeded)
+
+                  console.log("Interval:", interval.toNumber())
+                  console.log("Upkeep Needed:", upKeepNeeded)
+
+                  assert(!upKeepNeeded, "Expected upkeep to be false, but it was true.")
               })
 
               it("returns true if enough time has passed, has players, eth, and is open", async () => {
