@@ -21,6 +21,7 @@ developmentChains.includes(network.name)
                 const accounts = await ethers.getSigners()
 
                 await new Promise(async (resolve, reject) => {
+                    console.log("here 1")
                     lottery.once("WinnerPicked", async () => {
                         console.log("WinnerPicked event fired!")
                         try {
@@ -44,15 +45,20 @@ developmentChains.includes(network.name)
                             reject(e)
                         }
                     })
+                    //setup listener before we eneter the lottery
+                    //Just in case the blockchain moves really fast
                     //Then entering the lottery
-                    await lottery.enterLottery({ value: lotteryEnteranceFee })
-                    const winnerStartingBalance = await accounts[0].getBalance()
-                    
-                    // and this code wont complete until our listener has finished listening!
+                    try {
+                        await lottery.enterLottery({ value: lotteryEnteranceFee })
+                        const winnerStartingBalance = await accounts[0].getBalance()
+                        
+                        // and this code wont complete until our listener has finished listening!
+                    } catch (e) {
+                        console.log(e)
+                        reject(e)
+                    }
                 })
 
-                //setup listener before we eneter the lottery
-                //Just in case the blockchain moves really fast
 
                 
             })

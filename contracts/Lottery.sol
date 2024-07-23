@@ -131,7 +131,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
         s_lotteryState = LotteryState.CALCULATING;
 
-        uint256 requestId = i_vrfCoordinator.requestRandomWords(
+        uint256 requestId = s_vrfCoordinator.requestRandomWords(
             VRFV2PlusClient.RandomWordsRequest({
                 keyHash: i_gasLane, //gasLane
                 subId: i_subscriptionId, //Subscription ID that we need for funding requests (here it is to request a random number)

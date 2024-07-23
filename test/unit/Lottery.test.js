@@ -65,7 +65,7 @@ const { assert, expect } = require("chai")
               })
           })
 
-          describe("emits event on test", () => {
+          describe("checkUpkeep", () => {
               it("returns false if people haven't sent any ETH", async () => {
                   //   'network.provider.send' sends a command to the blockchain node.
                   //   "evm_increaseTime" is a special command that tells the blockchain to pretend that time has moved forward.
@@ -91,7 +91,7 @@ const { assert, expect } = require("chai")
 
               it("returns false if enough time hasn't passed", async () => {
                   await lottery.enterLottery({ value: lotteryEnteranceFee })
-                  await network.provider.send("evm_increaseTime", [interval.toNumber() - 1])
+                  await network.provider.send("evm_increaseTime", [interval.toNumber() - 2])
                   await network.provider.send("evm_mine", [])
                   //   await network.provider.request({ method: "evm_mine", params: [] })
                   const { upKeepNeeded } = await lottery.callStatic.checkUpkeep("0x")
@@ -168,12 +168,13 @@ const { assert, expect } = require("chai")
                       await accountConnectedLottery.enterLottery({ value: lotteryEnteranceFee })
                   }
                   const startingTimeStamp = await lottery.getLatestTimeStamp()
+                  const winnerStartingBalance = await accounts[1].getBalance()
 
                   //   performUpKeep (mock being Chainlink Keepers)
                   //   fulfillRandomWords (mock being the Chainlink VRF)
                   //   we will have to wait for the fulfillRandomWords to be called
                   await new Promise(async (resolve, reject) => {
-                      console.log("here")
+                      console.log("here 1")
                       lottery.once("WinnerPicked", async () => {
                           console.log("Found the event!")
                           try {
@@ -186,12 +187,12 @@ const { assert, expect } = require("chai")
                               const lotteryState = await lottery.getLotteryState()
                               const endingTimeStamp = await lottery.getLatestTimeStamp()
                               const numPlayers = await lottery.getNumberOfPlayers()
-                              const winnerEndingBalnce = await accounts[1].getBalance()
+                              const winnerEndingBalance = await accounts[1].getBalance()
                               assert.equal(numPlayers.toString, "0")
                               assert.equal(lotteryState.toString, "0")
                               assert(endingTimeStamp > startingTimeStamp)
                               assert.equal(
-                                  winnerEndingBalnce.toString(),
+                                  winnerEndingBalance.toString(),
                                   winnerStartingBalance.add(
                                       lotteryEnteranceFee
                                           .mul(additionalEntrants)
@@ -207,7 +208,9 @@ const { assert, expect } = require("chai")
                       //Setting up the listener
 
                       try {
-                          const tx = await lottery.performUpkeep([])
+                          console.log("here 3!")
+                          const tx = await lottery.performUpkeep("0x")
+                          console.log("here 4!")
                           const txReceipt = await tx.wait(1)
 
                           //   // Ensure txReceipt.events[1].args.requestId is correct
@@ -215,13 +218,11 @@ const { assert, expect } = require("chai")
                           //   console.log("Request ID:", requestId)
 
                           //   below, we will fire the event and the listener will pick it up and resolve
-                          const winnerStartingBalance = await accounts[1].getBalance()
                           console.log("here 2")
                           await vrfCoordinatorV2Mock.fulfillRandomWords(
                               txReceipt.events[1].args.requestId,
                               lottery.address,
                           )
-                          resolve()
                       } catch (e) {
                           console.log(e)
                           reject(e)
