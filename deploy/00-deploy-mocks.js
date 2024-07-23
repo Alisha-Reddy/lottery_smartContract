@@ -1,4 +1,4 @@
-const { ethers } = require("hardhat")
+const { ethers, network } = require("hardhat")
 const { developmentChains } = require("../helper-hardhat-config")
 
 const BASE_FEE = ethers.utils.parseEther("0.25") //0.25 is the premium. It costs 0.25 LINK per request
@@ -6,11 +6,13 @@ const GAS_PRICE_LINK = 1e9 //link per gas. calculated value based on the gas pri
 
 // Chainlink nodes pay the gas to give us randomness & do external execution
 // So the price of requests change based on the price of gas
-
+// console.log('here')
 module.exports = async function ({ getNamedAccounts, deployments }) {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
     const args = [BASE_FEE, GAS_PRICE_LINK]
+
+    // console.log(network.name)
 
     if (developmentChains.includes(network.name)) {
         log("Local network detected! Deploying mocks...")
