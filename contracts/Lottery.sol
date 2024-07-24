@@ -21,12 +21,12 @@ error Lottery_TransferFailed();
 error Lottery_NotOpen();
 error Lottery_UpKeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 lotteryState);
 
-/**@title A sample Lottery Contract
+/**
+ * @title A sample Lottery Contract
  * @author Alisha Reddy Kondapu
  * @notice This contract is for creatying an untamperable decentralized smart contract
  * @dev This implements Chainlink VRF V2 and Chainlink Keepers
  */
-
 contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     /* Type declaration*/
     enum LotteryState {
@@ -95,9 +95,11 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
      * 3. Our subscription is funded with LINK
      * 4. The lottery should be in an "open" state.
      */
-    function checkUpkeep(
-        bytes memory /*checkData*/
-    ) public override returns (bool upKeepNeeded, bytes memory /* performData*/) {
+    function checkUpkeep(bytes memory /*checkData*/ )
+        public
+        override
+        returns (bool upKeepNeeded, bytes memory /* performData*/ )
+    {
         bool isOpen = (LotteryState.OPEN == s_lotteryState);
         bool timePassed = (block.timestamp - s_lastTimeStamp) > i_interval;
         bool hasPlayers = (s_players.length > 0);
@@ -119,28 +121,22 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         return (upKeepNeeded, "");
     }
 
-    function performUpkeep(bytes calldata /*performData*/) external override {
-        (bool upKeepNeeded, ) = checkUpkeep("");
+    function performUpkeep(bytes calldata /*performData*/ ) external override {
+        (bool upKeepNeeded,) = checkUpkeep("");
         if (!upKeepNeeded) {
-            revert Lottery_UpKeepNotNeeded(
-                address(this).balance,
-                s_players.length,
-                uint256(s_lotteryState)
-            );
+            revert Lottery_UpKeepNotNeeded(address(this).balance, s_players.length, uint256(s_lotteryState));
         }
 
         s_lotteryState = LotteryState.CALCULATING;
 
-        uint256 requestId = s_vrfCoordinator.requestRandomWords(
+        uint256 requestId = i_vrfCoordinator.requestRandomWords(
             VRFV2PlusClient.RandomWordsRequest({
                 keyHash: i_gasLane, //gasLane
                 subId: i_subscriptionId, //Subscription ID that we need for funding requests (here it is to request a random number)
                 requestConfirmations: REQUEST_CONFIRMATIONS, //It says how many confirmations the chainlink node should wait before responding
                 callbackGasLimit: i_callbackGasLimit, //The limit for how much gas to use for the callback request to our contract's fulfillRandomWords() function.
                 numWords: NUM_WORDS, // number of random words we need
-                extraArgs: VRFV2PlusClient._argsToBytes(
-                    VRFV2PlusClient.ExtraArgsV1({nativePayment: false})
-                )
+                extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: true}))
             })
         );
 
@@ -148,17 +144,14 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         emit RequestedLotteryWinner(requestId);
     }
 
-    function fulfillRandomWords(
-        uint256 /*requestId*/,
-        uint256[] calldata randomWords
-    ) internal override {
+    function fulfillRandomWords(uint256, /*requestId*/ uint256[] calldata randomWords) internal override {
         uint256 indexOfWinner = randomWords[0] % s_players.length;
         address payable recentWinner = s_players[indexOfWinner];
         s_recentWinner = recentWinner;
         s_lotteryState = LotteryState.OPEN;
         s_players = new address payable[](0);
         s_lastTimeStamp = block.timestamp;
-        (bool success, ) = recentWinner.call{value: address(this).balance}("");
+        (bool success,) = recentWinner.call{value: address(this).balance}("");
 
         if (!success) {
             revert Lottery_TransferFailed();
