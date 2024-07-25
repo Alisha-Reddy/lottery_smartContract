@@ -8,13 +8,13 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
-    let vrfCoordinatorV2Address, subscriptionId, vrfCoordinatorV2Mock
+    let vrfCoordinatorV2Address, subscriptionId, vrfCoordinatorV2_5Mock 
 
     if (developmentChains.includes(network.name)) {
         log("local network detected")
-        // const vrfCoordinatorV2Mock = await ethers.getContractAt("VRFCoordinatorV2Mock")
+        // const vrfCoordinatorV2Mock = await ethers.getContractAt("VRFCoordinatorV2_5Mock")
         // log("vrfCoordinatorV2Mock :", vrfCoordinatorV2Mock)
-        const deployment = await deployments.get("VRFCoordinatorV2Mock")
+        const deployment = await deployments.get("VRFCoordinatorV2_5Mock")
          vrfCoordinatorV2Mock = await ethers.getContractAt(deployment.abi, deployment.address)
         // vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address
         // log("vrfCoordinatorV2Address:", vrfCoordinatorV2Address)
@@ -24,11 +24,13 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         // log("transactionResponse:" , transactionResponse)
         const transactionReceipt = await transactionResponse.wait(1)
         subscriptionId = transactionReceipt.events[0].args.subId
-        console.log("subscriptionId : ", subscriptionId.toString())
+        // console.log("......")
+        // console.log("subscriptionId : ", subscriptionId.toString())
         //Fund the subscription
         //Usually, you'd need the link token on a real network
         await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, VRF_SUB_FUND_AMOUNT)
         
+
     } else {
         vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatorV2"]
         subscriptionId = networkConfig[chainId]["subscriptionId"]
@@ -55,9 +57,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         waitConfirmations: network.config.blockConfirmations || 1,
     })
 
-    if (developmentChains.includes(network.name)) {   
+    if (developmentChains.includes(network.name)) {
         await vrfCoordinatorV2Mock.addConsumer(subscriptionId, lottery.address)
         // log("Consumer is added")
+        console.log("Consumer is added")
     }
 
 

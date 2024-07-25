@@ -34,7 +34,16 @@ module.exports = {
         coinmarketcap: COINMARKETCAP_API_KEY,
         token: "MATIC",
     },
-    solidity: "0.8.19",
+    solidity: {
+        version: "0.8.19",
+        settings: {
+            optimizer: {
+                enabled: true,
+                runs: 200,
+            },
+        },
+    },
+    plugins: ["hardhat-contract-sizer"],
     namedAccounts: {
         deployer: {
             default: 0,
@@ -44,7 +53,7 @@ module.exports = {
         },
     },
     mocha: {
-        timeout: 400000,
+        timeout: 200000,
     },
     etherscan: {
         apiKey: ETHERSCAN_API_KEY,

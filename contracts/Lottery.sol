@@ -21,7 +21,8 @@ error Lottery_TransferFailed();
 error Lottery_NotOpen();
 error Lottery_UpKeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 lotteryState);
 
-/**@title A sample Lottery Contract
+/**
+ * @title A sample Lottery Contract
  * @author Alisha Reddy Kondapu
  * @notice This contract is for creatying an untamperable decentralized smart contract
  * @dev This implements Chainlink VRF V2 and Chainlink Keepers
@@ -120,7 +121,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     }
 
     function performUpkeep(bytes calldata /*performData*/) external override {
-        (bool upKeepNeeded, ) = checkUpkeep("");
+        (bool upKeepNeeded,) = checkUpkeep("");
         if (!upKeepNeeded) {
             revert Lottery_UpKeepNotNeeded(
                 address(this).balance,
@@ -131,7 +132,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
         s_lotteryState = LotteryState.CALCULATING;
 
-        uint256 requestId = s_vrfCoordinator.requestRandomWords(
+        uint256 requestId = i_vrfCoordinator.requestRandomWords(
             VRFV2PlusClient.RandomWordsRequest({
                 keyHash: i_gasLane, //gasLane
                 subId: i_subscriptionId, //Subscription ID that we need for funding requests (here it is to request a random number)
@@ -139,7 +140,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
                 callbackGasLimit: i_callbackGasLimit, //The limit for how much gas to use for the callback request to our contract's fulfillRandomWords() function.
                 numWords: NUM_WORDS, // number of random words we need
                 extraArgs: VRFV2PlusClient._argsToBytes(
-                    VRFV2PlusClient.ExtraArgsV1({nativePayment: false})
+                    VRFV2PlusClient.ExtraArgsV1({nativePayment: true})
                 )
             })
         );
@@ -158,7 +159,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         s_lotteryState = LotteryState.OPEN;
         s_players = new address payable[](0);
         s_lastTimeStamp = block.timestamp;
-        (bool success, ) = recentWinner.call{value: address(this).balance}("");
+        (bool success,) = recentWinner.call{value: address(this).balance}("");
 
         if (!success) {
             revert Lottery_TransferFailed();

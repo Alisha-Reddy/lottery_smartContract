@@ -5,7 +5,7 @@ const { assert } = require("chai")
 developmentChains.includes(network.name)
     ? describe.skip
     : describe("Raffle staging test", () => {
-          let lottery, lotteryEnteranceFee, deployer, vrfCoordinatorV2Mock
+          let lottery, lotteryEnteranceFee, deployer
 
           beforeEach(async () => {
               deployer = (await getNamedAccounts()).deployer
@@ -17,11 +17,16 @@ developmentChains.includes(network.name)
         describe("fulfillRandomWords", () => {
             it("works with live Chainlink Keepers and Chainlink VRF, we get a random winner", async () => {
                 // enter the lottery
+                console.log("Setting up test...")
                 const startingTimeStamp = await lottery.getLatestTimeStamp()
                 const accounts = await ethers.getSigners()
 
+                console.log("Setting up listener...")
                 await new Promise(async (resolve, reject) => {
                     console.log("here 1")
+
+                    //setup listener before we eneter the lottery
+                    //Just in case the blockchain moves really fast
                     lottery.once("WinnerPicked", async () => {
                         console.log("WinnerPicked event fired!")
                         try {
@@ -42,21 +47,19 @@ developmentChains.includes(network.name)
                             resolve()
                         } catch (error) {
                             console.log(error)
-                            reject(e)
+                            reject(error)
                         }
                     })
-                    //setup listener before we eneter the lottery
-                    //Just in case the blockchain moves really fast
+
                     //Then entering the lottery
-                    try {
-                        await lottery.enterLottery({ value: lotteryEnteranceFee })
-                        const winnerStartingBalance = await accounts[0].getBalance()
-                        
-                        // and this code wont complete until our listener has finished listening!
-                    } catch (e) {
-                        console.log(e)
-                        reject(e)
-                    }
+
+                    console.log("Entering Lottery...")
+                    await lottery.enterLottery({ value: lotteryEnteranceFee })
+                    console.log("here 3")
+                    const winnerStartingBalance = await accounts[0].getBalance()
+                    console.log("here 4")
+
+                    // and this code wont complete until our listener has finished listening!
                 })
 
 

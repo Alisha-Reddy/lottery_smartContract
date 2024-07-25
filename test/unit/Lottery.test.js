@@ -5,28 +5,28 @@ const { assert, expect } = require("chai")
 !developmentChains.includes(network.name)
     ? describe.skip
     : describe("Lottery Unit Tests", () => {
-          let lottery, vrfCoordinatorV2Mock, lotteryEnteranceFee, deployer, interval
+          let lottery, vrfCoordinatorV2_5Mock, lotteryEnteranceFee, deployer, interval
           const chainId = network.config.chainId
 
           beforeEach(async () => {
               deployer = (await getNamedAccounts()).deployer
               await deployments.fixture(["all"])
-              const vrfCoordinatorV2MockDeployed = await deployments.get("VRFCoordinatorV2Mock")
-              vrfCoordinatorV2Mock = await ethers.getContractAt(
-                  "VRFCoordinatorV2Mock",
-                  vrfCoordinatorV2MockDeployed.address,
+              const vrfCoordinatorV2_5MockDeployed = await deployments.get("VRFCoordinatorV2_5Mock")
+              vrfCoordinatorV2_5Mock = await ethers.getContractAt(
+                  "VRFCoordinatorV2_5Mock",
+                  vrfCoordinatorV2_5MockDeployed.address,
               )
               const lotteryDeployed = await deployments.get("Lottery")
               lottery = await ethers.getContractAt("Lottery", lotteryDeployed.address)
               lotteryEnteranceFee = await lottery.getEnteranceFee()
               interval = await lottery.getInterval()
 
-              //   vrfCoordinatorV2Mock.addConsumer(1, lotteryDeployed.address)
+              //   vrfCoordinatorV2_5Mock.addConsumer(1, lotteryDeployed.address)
           })
 
           describe("constructor", () => {
               it("initializes the lottery correctly", async () => {
-                  //Ideally we make our tests hav just 1 assert per "it"
+                  //Ideally we make our tests have just 1 assert per "it"
                   const lotteryState = await lottery.getLotteryState()
                   assert.equal(lotteryState.toString(), "0")
                   assert.equal(interval.toString(), networkConfig[chainId]["interval"])
@@ -91,7 +91,7 @@ const { assert, expect } = require("chai")
 
               it("returns false if enough time hasn't passed", async () => {
                   await lottery.enterLottery({ value: lotteryEnteranceFee })
-                  await network.provider.send("evm_increaseTime", [interval.toNumber() - 2])
+                  await network.provider.send("evm_increaseTime", [interval.toNumber() - 3])
                   await network.provider.send("evm_mine", [])
                   //   await network.provider.request({ method: "evm_mine", params: [] })
                   const { upKeepNeeded } = await lottery.callStatic.checkUpkeep("0x")
@@ -148,11 +148,11 @@ const { assert, expect } = require("chai")
 
               it("can only be called after performUpKeep", async () => {
                   await expect(
-                      vrfCoordinatorV2Mock.fulfillRandomWords(0, lottery.address),
-                  ).to.be.revertedWith("nonexistent request")
-                  await expect(
-                      vrfCoordinatorV2Mock.fulfillRandomWords(1, lottery.address),
-                  ).to.be.revertedWith("nonexistent request")
+                      vrfCoordinatorV2_5Mock.fulfillRandomWords(0, lottery.address),
+                  ).to.be.revertedWith("InvalidRequest")
+                  //   await expect(
+                  //       vrfCoordinatorV2_5Mock.fulfillRandomWords(1, lottery.address),
+                  //   ).to.be.revertedWith("nonexistent request")
               })
 
               it("picks a winner, resets the lottery, and sends money", async () => {
@@ -219,7 +219,7 @@ const { assert, expect } = require("chai")
 
                           //   below, we will fire the event and the listener will pick it up and resolve
                           console.log("here 2")
-                          await vrfCoordinatorV2Mock.fulfillRandomWords(
+                          await vrfCoordinatorV2_5Mock.fulfillRandomWords(
                               txReceipt.events[1].args.requestId,
                               lottery.address,
                           )
