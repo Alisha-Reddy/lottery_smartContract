@@ -2,7 +2,7 @@ const { network, ethers } = require("hardhat")
 const { developmentChains, networkConfig } = require("../helper-hardhat-config")
 const { verify } = require("../utils/verify")
 
-const VRF_SUB_FUND_AMOUNT = ethers.utils.parseEther("1")
+const VRF_SUB_FUND_AMOUNT = ethers.utils.parseEther("100")
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
@@ -12,16 +12,16 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     if (developmentChains.includes(network.name)) {
         log("local network detected")
-        // const vrfCoordinatorV2Mock = await ethers.getContractAt("VRFCoordinatorV2_5Mock")
-        // const vrfCoordinatorV2Mock = await ethers.getContractAt("VRFCoordinatorV2_5Mock")
-        // log("vrfCoordinatorV2Mock :", vrfCoordinatorV2Mock)
+        // const vrfCoordinatorV2_5Mock = await ethers.getContractAt("VRFCoordinatorV2_5Mock")
+        // const vrfCoordinatorV2_5Mock = await ethers.getContractAt("VRFCoordinatorV2_5Mock")
+        // log("vrfCoordinatorV2_5Mock :", vrfCoordinatorV2_5Mock)
         const deployment = await deployments.get("VRFCoordinatorV2_5Mock")
         vrfCoordinatorV2_5Mock = await ethers.getContractAt(deployment.abi, deployment.address)
         // vrfCoordinatorV2_5Address = vrfCoordinatorV2_5Mock.address
         // log("vrfCoordinatorV2_5Address:", vrfCoordinatorV2_5Address)
         vrfCoordinatorV2_5Address = deployment.address
         // log('vrfCoordinatorV2_5Address:', vrfCoordinatorV2_5Address)
-        const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
+        const transactionResponse = await vrfCoordinatorV2_5Mock.createSubscription()
         // log("transactionResponse:" , transactionResponse)
         const transactionReceipt = await transactionResponse.wait(1)
         subscriptionId = transactionReceipt.events[0].args.subId
@@ -31,7 +31,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         console.log("subscriptionId : ", subscriptionId.toString())
         //Fund the subscription
         //Usually, you'd need the link token on a real network
-        await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, VRF_SUB_FUND_AMOUNT)
+        await vrfCoordinatorV2_5Mock.fundSubscription(subscriptionId, VRF_SUB_FUND_AMOUNT)
 
 
     } else {
@@ -61,7 +61,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     })
 
     if (developmentChains.includes(network.name)) {
-        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, lottery.address)
+        // await vrfCoordinatorV2_5Mock.fundSubscription(subscriptionId, VRF_SUB_FUND_AMOUNT)
+        await vrfCoordinatorV2_5Mock.addConsumer(subscriptionId, lottery.address)
         // console.log(subscriptionId)
         console.log("Consumer is added")
     }
