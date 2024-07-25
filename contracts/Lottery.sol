@@ -27,7 +27,6 @@ error Lottery_UpKeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint25
  * @notice This contract is for creatying an untamperable decentralized smart contract
  * @dev This implements Chainlink VRF V2 and Chainlink Keepers
  */
-
 contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     /* Type declaration*/
     enum LotteryState {
@@ -96,9 +95,11 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
      * 3. Our subscription is funded with LINK
      * 4. The lottery should be in an "open" state.
      */
-    function checkUpkeep(
-        bytes memory /*checkData*/
-    ) public override returns (bool upKeepNeeded, bytes memory /* performData*/) {
+    function checkUpkeep(bytes memory /*checkData*/ )
+        public
+        override
+        returns (bool upKeepNeeded, bytes memory /* performData*/ )
+    {
         bool isOpen = (LotteryState.OPEN == s_lotteryState);
         bool timePassed = (block.timestamp - s_lastTimeStamp) > i_interval;
         bool hasPlayers = (s_players.length > 0);
@@ -120,14 +121,10 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         return (upKeepNeeded, "");
     }
 
-    function performUpkeep(bytes calldata /*performData*/) external override {
+    function performUpkeep(bytes calldata /*performData*/ ) external override {
         (bool upKeepNeeded,) = checkUpkeep("");
         if (!upKeepNeeded) {
-            revert Lottery_UpKeepNotNeeded(
-                address(this).balance,
-                s_players.length,
-                uint256(s_lotteryState)
-            );
+            revert Lottery_UpKeepNotNeeded(address(this).balance, s_players.length, uint256(s_lotteryState));
         }
 
         s_lotteryState = LotteryState.CALCULATING;
@@ -139,9 +136,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
                 requestConfirmations: REQUEST_CONFIRMATIONS, //It says how many confirmations the chainlink node should wait before responding
                 callbackGasLimit: i_callbackGasLimit, //The limit for how much gas to use for the callback request to our contract's fulfillRandomWords() function.
                 numWords: NUM_WORDS, // number of random words we need
-                extraArgs: VRFV2PlusClient._argsToBytes(
-                    VRFV2PlusClient.ExtraArgsV1({nativePayment: true})
-                )
+                extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: true}))
             })
         );
 
@@ -149,10 +144,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         emit RequestedLotteryWinner(requestId);
     }
 
-    function fulfillRandomWords(
-        uint256 /*requestId*/,
-        uint256[] calldata randomWords
-    ) internal override {
+    function fulfillRandomWords(uint256, /*requestId*/ uint256[] calldata randomWords) internal override {
         uint256 indexOfWinner = randomWords[0] % s_players.length;
         address payable recentWinner = s_players[indexOfWinner];
         s_recentWinner = recentWinner;

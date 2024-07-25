@@ -13,11 +13,11 @@ const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "key"
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "key"
 
 module.exports = {
-    defaultNetworks: "hardhat",
     networks: {
         hardhat: {
             chainId: 31337,
             blockConfirmations: 1,
+            allowUnlimitedContractSize: true
         },
         sepolia: {
             url: SEPOLIA_RPC_URL,
