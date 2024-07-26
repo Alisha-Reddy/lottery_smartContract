@@ -7,7 +7,7 @@ const networkConfig = {
         enteranceFee: ethers.utils.parseEther("0.005"),
         gasLane: "0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae",
         subscriptionId:
-            "29570655863828706447197293786409316683287933875602777461102851600313483613238",
+            "10934790610309635938768864170246170727904081629632230265749781917397871379724",
         callbackGasLimit: "5000000", //500,000
         interval: "30", //30 sec
     },
@@ -20,9 +20,9 @@ const networkConfig = {
     },
 }
 
-const developmentChains = ['hardhat', 'localhost']
+const developmentChains = ["hardhat", "localhost"]
 
 module.exports = {
     networkConfig,
-    developmentChains
+    developmentChains,
 }

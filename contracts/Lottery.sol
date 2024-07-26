@@ -37,7 +37,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     /* State Variables */
     uint256 private immutable i_enteranceFee;
     address payable[] private s_players;
-    IVRFCoordinatorV2Plus private immutable i_vrfCoordinator;
+    // IVRFCoordinatorV2Plus private immutable i_vrfCoordinator;
     bytes32 private immutable i_gasLane;
     uint256 private immutable i_subscriptionId;
     uint32 private immutable i_callbackGasLimit;
@@ -65,7 +65,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         uint256 interval
     ) VRFConsumerBaseV2Plus(vrfCoordinatorV2) {
         i_enteranceFee = enteranceFee;
-        i_vrfCoordinator = IVRFCoordinatorV2Plus(vrfCoordinatorV2);
+        // i_vrfCoordinator = IVRFCoordinatorV2Plus(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
@@ -129,14 +129,14 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
         s_lotteryState = LotteryState.CALCULATING;
 
-        uint256 requestId = i_vrfCoordinator.requestRandomWords(
+        uint256 requestId = s_vrfCoordinator.requestRandomWords(
             VRFV2PlusClient.RandomWordsRequest({
                 keyHash: i_gasLane, //gasLane
                 subId: i_subscriptionId, //Subscription ID that we need for funding requests (here it is to request a random number)
                 requestConfirmations: REQUEST_CONFIRMATIONS, //It says how many confirmations the chainlink node should wait before responding
                 callbackGasLimit: i_callbackGasLimit, //The limit for how much gas to use for the callback request to our contract's fulfillRandomWords() function.
                 numWords: NUM_WORDS, // number of random words we need
-                extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: true}))
+                extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: false}))
             })
         );
 

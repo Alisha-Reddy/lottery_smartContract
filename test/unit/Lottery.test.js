@@ -188,8 +188,8 @@ const { assert, expect } = require("chai")
                             const endingTimeStamp = await lottery.getLatestTimeStamp()
                             const numPlayers = await lottery.getNumberOfPlayers()
                             const winnerEndingBalance = await accounts[1].getBalance()
-                            assert.equal(numPlayers.toString, "0")
-                            assert.equal(lotteryState.toString, "0")
+                            assert.equal(numPlayers.toString(), "0")
+                            assert.equal(lotteryState.toString(), "0")
                             assert(endingTimeStamp > startingTimeStamp)
                             assert.equal(
                                 winnerEndingBalance.toString(),

@@ -20,7 +20,8 @@ developmentChains.includes(network.name)
                 console.log("Setting up test...")
                 const startingTimeStamp = await lottery.getLatestTimeStamp()
                 const accounts = await ethers.getSigners()
-
+                const winnerStartingBalance = await accounts[0].getBalance()
+                
                 console.log("Setting up listener...")
                 await new Promise(async (resolve, reject) => {
                     console.log("here 1")
@@ -53,11 +54,17 @@ developmentChains.includes(network.name)
 
                     //Then entering the lottery
 
-                    console.log("Entering Lottery...")
-                    await lottery.enterLottery({ value: lotteryEnteranceFee })
-                    console.log("here 3")
-                    const winnerStartingBalance = await accounts[0].getBalance()
-                    console.log("here 4")
+                    try {
+                        console.log("Entering Lottery...")
+                        const tx = await lottery.enterLottery({ value: lotteryEnteranceFee })
+                        console.log("here 3")
+                        await tx.wait(1)
+                        console.log("here 4")
+                    } catch (error) {
+                        console.log(error)
+                        reject(error)
+                    }
+                    
 
                     // and this code wont complete until our listener has finished listening!
                 })
