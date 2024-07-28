@@ -97,6 +97,7 @@ contract Lottery is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
      */
     function checkUpkeep(bytes memory /*checkData*/ )
         public
+        view
         override
         returns (bool upKeepNeeded, bytes memory /* performData*/ )
     {

@@ -35,7 +35,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
 
     } else {
-        vrfCoordinatorV2_5Address = networkConfig[chainId]["vrfCoordinatorV2"]
+        vrfCoordinatorV2_5Address = networkConfig[chainId]["vrfCoordinatorV2_5"]
         subscriptionId = networkConfig[chainId]["subscriptionId"]
     }
 

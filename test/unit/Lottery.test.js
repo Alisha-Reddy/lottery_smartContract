@@ -179,11 +179,11 @@ const { assert, expect } = require("chai")
                         console.log("Found the event!")
                         try {
                             const recentWinner = await lottery.getRecentWinner()
-                            console.log(recentWinner)
-                            console.log(accounts[2].address)
-                            console.log(accounts[0].address)
-                            console.log(accounts[1].address)
-                            console.log(accounts[3].address)
+                            // console.log("Recent winner",recentWinner)
+                            // console.log("account 2:",accounts[2].address)
+                            // console.log("account 0:",accounts[0].address)
+                            // console.log("account 1:",accounts[1].address)
+                            // console.log("account 3:",accounts[3].address)
                             const lotteryState = await lottery.getLotteryState()
                             const endingTimeStamp = await lottery.getLatestTimeStamp()
                             const numPlayers = await lottery.getNumberOfPlayers()
@@ -219,8 +219,8 @@ const { assert, expect } = require("chai")
 
                         //   below, we will fire the event and the listener will pick it up and resolve
                         console.log("here 2")
-                        console.log(vrfCoordinatorV2_5Mock.address)
-                        console.log(await ethers.provider.getBalance(vrfCoordinatorV2_5Mock.address))
+                        // console.log(vrfCoordinatorV2_5Mock.address)
+                        // console.log(await ethers.provider.getBalance(vrfCoordinatorV2_5Mock.address))
                         // await vrfCoordinatorV2_5Mock.fundSubscription(4744166381310863501138045196023465007055758975682737987407865132286210751629n, ethers.utils.parseEther("10"))
                         await vrfCoordinatorV2_5Mock.fulfillRandomWords(
                             txReceipt.events[1].args.requestId,
