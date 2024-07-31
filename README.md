@@ -21,7 +21,7 @@ This project implements a decentralized lottery system using Ethereum smart cont
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/lottery-smart-contract.git
+git https://github.com/Alisha-Reddy/lottery_smartContract.git
 
 # Navigate to the project directory
 cd lottery-smart-contract
